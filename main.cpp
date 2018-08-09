@@ -9,13 +9,13 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    Mat image = imread("/home/bartosz/Dokumenty/Repositories/text_detector/NTR/counter0.jpg");
+    Mat image = imread("/home/bartek/Pictures/gazety/Wspolczesna20092016.jpg");
 
     ManualDetect detector;
 
     detector.detectBoxes(image);
+    detector.displayAllSherds();
 
-    cv::Point_<int> first_click_ (0,0);
 
     return a.exec();
 }

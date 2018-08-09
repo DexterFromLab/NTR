@@ -10,15 +10,13 @@ TEMPLATE = app
 SOURCES += main.cpp \
     rectangledetector.cpp
 
+unix:!macx: LIBS += -L$$PWD/../opencv_install/lib/ -lopencv_bioinspired
 
-unix:!macx: LIBS += -L$$PWD/../install/lib/ -lopencv_bioinspired
-
-INCLUDEPATH += $$PWD/../install/include
-DEPENDPATH += $$PWD/../install/include
+INCLUDEPATH += $$PWD/../opencv_install/include
+DEPENDPATH += $$PWD/../opencv_install/include
 
 unix: CONFIG += link_pkgconfig
-unix: PKGCONFIG += /home/bartosz/Dokumenty/Repositories/text_detector/install/lib/pkgconfig/opencv.pc
+unix: PKGCONFIG += /home/bartek/Repositories/opencv_install/lib/pkgconfig/opencv.pc
 
 HEADERS += \
-    rectangledetector.h
-
+rectangledetector.h

@@ -12,15 +12,17 @@ class RectangleDetector
 public:
     RectangleDetector();
     std::vector <cv::Mat> pictures_to_recognation;
+    void displayAllSherds(void);
 protected:
     std::vector<cv::Rect> groups_boxes;
+    const std::string window_name = "Catched_rectangle";
 
     virtual std::vector<cv::Rect> retBoxes(){
         return groups_boxes;
     }
 };
 
-class ManualDetect : protected RectangleDetector{
+class ManualDetect : public RectangleDetector{
 public:
     void detectBoxes(const cv::Mat & image);
     void mouseCallback(int event, int x, int y);

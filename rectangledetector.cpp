@@ -9,12 +9,18 @@ RectangleDetector::RectangleDetector()
 {
 
 }
-
+void RectangleDetector::displayAllSherds(void){
+    int i = 0;
+    for(auto shred : pictures_to_recognation){
+        imshow(window_name + to_string(i), shred);
+        i++;
+    }
+    namedWindow(window_name,WINDOW_NORMAL);
+}
 void on_push(int state, void*) {}
 
 void ManualDetect::detectBoxes(const Mat & image){
     char pessedKey = 0;
-
 
     while(pessedKey != 27){
         Mat imageCopy;
@@ -33,7 +39,6 @@ void ManualDetect::detectBoxes(const Mat & image){
         }
 
         for(auto recangle : groups_boxes){
-            cout<<recangle<<endl;
             rectangle(imageCopy, recangle, Scalar(0,0,255,0), 6);
         }
 
@@ -42,14 +47,21 @@ void ManualDetect::detectBoxes(const Mat & image){
         setMouseCallback(window_name, mouseCallback, this);
 
         if(pessedKey == 'c' && rect_to_red_.size().height > 0 && rect_to_red_.size().width > 0){
-            cout << "Add rect to groups_boxes"<<endl;
             groups_boxes.push_back(rect_to_red_);
         }
 
+        if(pessedKey == 13){
+
+            for(auto rectangle : groups_boxes){
+                pictures_to_recognation.push_back(image(rectangle));
+            }
+            destroyWindow(window_name);
+            break;
+        }
 
         pessedKey = waitKey(50);
     }
-
+    return;
 }
 
 

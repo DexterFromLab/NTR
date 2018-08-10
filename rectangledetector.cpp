@@ -15,9 +15,27 @@ void RectangleDetector::displayAllSherds(void){
         imshow(window_name + to_string(i), shred);
         i++;
     }
-    namedWindow(window_name,WINDOW_NORMAL);
+    waitKey(10);
 }
-void on_push(int state, void*) {}
+void RectangleDetector::changeAllShreadsToGray(){
+
+   for(int i = 0 ; i < pictures_to_recognation.size() ; i++){
+
+        cv::cvtColor(pictures_to_recognation[i], pictures_to_recognation[i], cv::COLOR_RGB2GRAY);
+
+    }
+
+}
+
+void RectangleDetector::changeAllShreadsTreshold(int lvl){
+
+    for(int i = 0 ; i < pictures_to_recognation.size() ; i++){
+
+         threshold( pictures_to_recognation[i], pictures_to_recognation[i], lvl, 255,4 );
+         pictures_to_recognation[i].convertTo(pictures_to_recognation[i],-1,2.2,100);
+     }
+
+}
 
 void ManualDetect::detectBoxes(const Mat & image){
     char pessedKey = 0;

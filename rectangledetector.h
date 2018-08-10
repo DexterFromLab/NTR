@@ -4,6 +4,7 @@
 #include "opencv2/opencv.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/core/types.hpp"
+#include <opencv2/opencv.hpp>
 #include <vector>
 
 
@@ -12,11 +13,14 @@ class RectangleDetector
 public:
     RectangleDetector();
     std::vector <cv::Mat> pictures_to_recognation;
-    void displayAllSherds(void);
-protected:
     std::vector<cv::Rect> groups_boxes;
-    const std::string window_name = "Catched_rectangle";
 
+    void displayAllSherds(void);
+    void clearAllShreads(void);
+    void changeAllShreadsToGray(void);
+    void changeAllShreadsTreshold(int lvl);
+protected:
+    const std::string window_name = "Catched_rectangle";
     virtual std::vector<cv::Rect> retBoxes(){
         return groups_boxes;
     }

@@ -6,7 +6,7 @@
 #include "opencv2/core/types.hpp"
 #include <opencv2/opencv.hpp>
 #include <vector>
-
+#include "textrecognation.h"
 
 class RectangleDetector
 {
@@ -18,7 +18,8 @@ public:
     void displayAllSherds(void);
     void clearAllShreads(void);
     void changeAllShreadsToGray(void);
-    void changeAllShreadsTreshold(int lvl);
+    void changeAllShreadsFilters(int treshold_lvl,int treshold_type, float alpha, int beta);
+    void filtersAutoadaptation(const char * realSigns, TextRecognation &detector);
 protected:
     const std::string window_name = "Catched_rectangle";
     virtual std::vector<cv::Rect> retBoxes(){

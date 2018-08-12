@@ -17,10 +17,15 @@ void TextRecognation::recognateNumber(){
     vector<int> out_classes;
     vector<double> out_confidences;
 
+    recognation_results.recognised_signs_.clear();
+    recognation_results.confidences_.clear();
+
     for(auto image : images_){
         ocr->eval(image, out_classes, out_confidences);
 
-        qDebug() << "OCR output = \"" << vocabulary[out_classes[0]] << "\" with confidence " <<out_confidences[0];
+        //qDebug() << "OCR output = \"" << vocabulary[out_classes[0]] << "\" with confidence " <<out_confidences[0];
+        recognation_results.recognised_signs_.push_back(vocabulary[out_classes[0]]);
+        recognation_results.confidences_.push_back(out_confidences[0]);
     }
 
 }

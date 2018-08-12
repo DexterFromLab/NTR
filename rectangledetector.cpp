@@ -1,6 +1,7 @@
 #include "rectangledetector.h"
 #include <string>
 #include <iostream>
+#include <cstdlib>
 
 using namespace cv;
 using namespace std;
@@ -19,22 +20,129 @@ void RectangleDetector::displayAllSherds(void){
 }
 void RectangleDetector::changeAllShreadsToGray(){
 
-   for(int i = 0 ; i < pictures_to_recognation.size() ; i++){
+   for(unsigned int i = 0 ; i < pictures_to_recognation.size() ; i++){
 
         cv::cvtColor(pictures_to_recognation[i], pictures_to_recognation[i], cv::COLOR_RGB2GRAY);
 
     }
 
 }
+/*
+   Function: changeAllShreadsFilters
+   Applies threshold, brightness and contrast filters to selected pictures
+   Parameters:
+      treshold_lvl  - 0 : 255
+      treshold_type - 0: Binary
+                      1: Binary Inverted
+                      2: Threshold Truncated
+                      3: Threshold to Zero
+                      4: Threshold to Zero Inverted
+      alpha         - Enter the alpha value [1.0-3.0]: 2.2
+      beta          - Enter the beta value [0-100]: 50
+   Returns:
+      void
 
-void RectangleDetector::changeAllShreadsTreshold(int lvl){
+*/
+void RectangleDetector::changeAllShreadsFilters(int treshold_lvl,int treshold_type, float alpha, int beta){
 
-    for(int i = 0 ; i < pictures_to_recognation.size() ; i++){
+    for(unsigned int i = 0 ; i < pictures_to_recognation.size() ; i++){
 
-         threshold( pictures_to_recognation[i], pictures_to_recognation[i], lvl, 255,4 );
-         pictures_to_recognation[i].convertTo(pictures_to_recognation[i],-1,2.2,100);
+         threshold( pictures_to_recognation[i], pictures_to_recognation[i], treshold_lvl, 255,treshold_type);
+         pictures_to_recognation[i].convertTo(pictures_to_recognation[i],-1,alpha,beta);
      }
 
+}
+
+void RectangleDetector::filtersAutoadaptation(const char * realSigns, TextRecognation &detector){
+    Mat originPicturesCopy[pictures_to_recognation.size()];
+
+    for(int i = 0 ; i < pictures_to_recognation.size() ; i++){
+        pictures_to_recognation[i].copyTo(originPicturesCopy[i]);
+    }
+
+    int found_solution_flag = 0;
+
+    vector <int> treshold_lvl_v;
+    vector <int> treshold_type_v;
+    vector <float> alpha_v;
+    vector <int> beta_v;
+    vector <double> confidences[pictures_to_recognation.size()];
+
+    const int size_of_population = 100;
+    const int mutation_rate = 0.1;
+    //Generate random population
+    for(unsigned int i = 0 ; i < size_of_population ; i++){
+        treshold_lvl_v.push_back(rand() % 255);
+        treshold_type_v.push_back(rand() % 5);
+        alpha_v.push_back((double)((rand() % 19)+10)/10);
+        beta_v.push_back(rand() % 100);
+    }
+
+    while(1){
+        //Check population codition
+        for(unsigned int i = 0 ; i < size_of_population ; i++){
+            changeAllShreadsFilters(treshold_lvl_v[i],treshold_type_v[i], alpha_v[i], beta_v[i]);
+            qDebug() << treshold_lvl_v[i] << treshold_type_v[i] << alpha_v[i] << beta_v[i] << endl;
+            detector.recognateNumber();
+
+            for(unsigned int y = 0 ; y < detector.recognation_results.confidences_.size() ; y++){
+                confidences[y].push_back(detector.recognation_results.confidences_[y]);
+            }
+
+            displayAllSherds();
+
+            for(int y = 0 ; y < pictures_to_recognation.size() ; y++){
+                originPicturesCopy[y].copyTo(pictures_to_recognation[y]);
+            }
+        }
+        //Sort population
+        qDebug()<<"===============";
+        for(unsigned int i = 0 ; i < size_of_population ; i++){
+            qDebug()<<treshold_lvl_v[i];
+        }
+       int change = 0;
+       for(unsigned int i = 0 ; i < size_of_population ; i++){
+           int better_flag = 0;
+           for(unsigned int y = 0 ; y < detector.recognation_results.confidences_.size()-1 ; y++){
+               if(confidences[i][y] < confidences[i+1][y]){
+                   better_flag++;
+               }
+           }
+           if(better_flag == detector.recognation_results.confidences_.size() - 1){
+               qDebug()<<"Found better solution!";
+               int treshold_lvl_tmp = treshold_lvl_v[i];
+               int treshold_type_tmp = treshold_type_v[i];
+               float alpha_tmp = alpha_v[i];
+               int beta_tmp = beta_v[i];
+               double confidences_tmp[pictures_to_recognation.size()];
+
+               for(unsigned int y = 0 ; y < detector.recognation_results.confidences_.size() ; y++){
+                   confidences_tmp[y] = confidences[i][y];
+               }
+
+               treshold_lvl_v[i] = treshold_lvl_v[i+1];
+               treshold_type_v[i] = treshold_type_v[i+1];
+               alpha_v[i] = alpha_v[i+1];
+               beta_v[i] = beta_v[i+1];
+               for(unsigned int y = 0 ; y < detector.recognation_results.confidences_.size() ; y++){
+                   confidences[i][y] = confidences[i+1][y];
+               }
+
+               treshold_lvl_v[i+1] = treshold_lvl_tmp;
+               treshold_type_v[i+1] = treshold_type_tmp;
+               alpha_v[i+1] = alpha_tmp;
+               beta_v[i+1] = beta_tmp;
+               for(unsigned int y = 0 ; y < detector.recognation_results.confidences_.size() ; y++){
+                   confidences[i+1][y] = confidences_tmp[y];
+               }
+           }
+           if(change == 0) break;
+       }
+       qDebug()<<"===============";
+       for(unsigned int i = 0 ; i < size_of_population ; i++){
+           qDebug()<<treshold_lvl_v[i];
+       }
+    }
 }
 
 void ManualDetect::detectBoxes(const Mat & image){

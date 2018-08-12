@@ -12,11 +12,17 @@
 #include <QCoreApplication>
 #include <QtDebug>
 
+
 class TextRecognation
 {
 public:
     TextRecognation(std::vector <cv::Mat> images, std::vector <cv::Rect> rectangles);
     void recognateNumber();
+    struct recognation_results_t
+    {
+       std::vector <char> recognised_signs_;
+       std::vector <double> confidences_;
+    }recognation_results;
 protected:
     std::vector <cv::Mat> images_;
     std::vector <cv::Rect> rectangles_;

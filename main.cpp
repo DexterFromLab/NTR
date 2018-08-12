@@ -11,16 +11,16 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    Mat image = imread("/home/bartosz/Obrazy/counter0.jpg");
+    Mat image = imread("/home/bartek/Repositories/NTR/counter0.jpg");
 
     ManualDetect detector;
 
     detector.detectBoxes(image);
     detector.changeAllShreadsToGray();
-    detector.changeAllShreadsTreshold(40);
-    detector.displayAllSherds();
-    TextRecognation recognation(detector.pictures_to_recognation, detector.groups_boxes);
+    //detector.changeAllShreadsTreshold(40);
 
+    TextRecognation recognation(detector.pictures_to_recognation, detector.groups_boxes);
+    detector.filtersAutoadaptation("007",recognation);
     recognation.recognateNumber();
 
     return a.exec();
